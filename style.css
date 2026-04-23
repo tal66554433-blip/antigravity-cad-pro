@@ -216,28 +216,29 @@ header {
 
 /* --- HUD & Overlays --- */
 
-#loading-overlay {
-    position: fixed;
-    inset: 0;
-    background: var(--bg-main);
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-}
-
 .loader {
-    width: 48px;
-    height: 48px;
-    border: 3px solid var(--border);
+    border: 2px solid var(--border);
     border-top-color: var(--accent);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
+
+.prop-input {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    color: #fff;
+    font-size: 0.8rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.prop-input:focus {
+    border-color: var(--accent);
+}
 
 /* --- Context Menu --- */
 

@@ -16,6 +16,10 @@ export const UI = {
         // Toolbar Tools
         document.querySelectorAll('.tool-btn[data-shape]').forEach(btn => {
             btn.addEventListener('click', () => {
+                if (!Kernel.isWasmActive) {
+                    this.setStatus("Kernel not ready yet...", "danger");
+                    return;
+                }
                 const shapeType = btn.dataset.shape;
                 this.app.addFeature(shapeType, {
                     width: 50, height: 50, depth: 50, radius: 25,

@@ -25,30 +25,26 @@ class App {
         // 1. Initialize Rendering Engine
         Engine.init(document.getElementById('canvas'));
         
-        // 2. Initialize Geometric Kernel
-        try {
-            document.getElementById('loading-text').innerText = "Waking up OpenCASCADE...";
-            await Kernel.init();
-            document.getElementById('loading-text').innerText = "Finalizing UI...";
-        } catch (err) {
-            console.error("Kernel failed to load:", err);
-            document.getElementById('loading-text').innerText = "Critical Error: Kernel Crash";
-            return;
-        }
-
-        // 3. Initialize UI Listeners
+        // 2. Initialize UI Listeners (Immediately)
         UI.init(this);
 
-        // 4. Ready!
-        this.hideOverlay();
-        console.log("App Ready.");
+        // 3. Initialize Geometric Kernel (Background)
+        try {
+            await Kernel.init();
+            document.getElementById('kernel-text').innerText = "Kernel: Online";
+            document.getElementById('kernel-spinner').style.display = 'none';
+            document.getElementById('kernel-status').style.color = 'var(--success)';
+        } catch (err) {
+            console.error("Kernel failed to load:", err);
+            document.getElementById('kernel-text').innerText = "Kernel: Error";
+            document.getElementById('kernel-spinner').style.display = 'none';
+            document.getElementById('kernel-status').style.color = 'var(--danger)';
+        }
+
+        console.log("App ready for background loading.");
     }
 
-    hideOverlay() {
-        const overlay = document.getElementById('loading-overlay');
-        overlay.style.opacity = '0';
-        setTimeout(() => overlay.style.display = 'none', 500);
-    }
+    // Overlay removed as requested
 
     // --- Feature Management ---
 
