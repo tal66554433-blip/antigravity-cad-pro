@@ -1,0 +1,27 @@
+{
+  "name": "antigravity-cad-pro",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tal66554433-blip/antigravity-cad-pro.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/tal66554433-blip/antigravity-cad-pro/issues"
+  },
+  "homepage": "https://github.com/tal66554433-blip/antigravity-cad-pro#readme",
+  "dependencies": {
+    "opencascade.js": "^1.1.1"
+  }
+}

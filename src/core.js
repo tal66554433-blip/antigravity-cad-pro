@@ -29,15 +29,14 @@ const btnExitSketch = document.getElementById('btn-exit-sketch');
 const btnNewSketch  = document.getElementById('btn-new-sketch');
 
 // Init Three.js scene -- delay until DOM layout is complete
-function init() {
+async function init() {
     initScene(canvas);
-    // Sketch state
-    // (moved below)
+    await Kernel.init();
 }
 
 // Use setTimeout to ensure CSS layout is complete
 window.addEventListener('load', function() {
-    setTimeout(function() { init(); boot(); }, 100);
+    setTimeout(async function() { await init(); boot(); }, 100);
 });
 
 let sketcher = null;
@@ -84,35 +83,60 @@ function evaluateCSG() {
         return;
     }
     try {
-        let baseMesh = null;
-        for (const op of state.operations) {
-            const geom = createGeometry(op);
-            geom.computeVertexNormals();
-            
-            if (!baseMesh) {
-                baseMesh = new THREE.Mesh(geom);
-                baseMesh.applyMatrix4(getMatrix(op));
-                baseMesh.updateMatrixWorld(true);
-                continue;
+        if (Kernel.isWasmActive) {
+            // --- OCCT B-Rep Evaluation Path ---
+            let finalShape = null;
+            for (const op of state.operations) {
+                const shape = Kernel.createShape(op);
+                if (!shape) continue;
+
+                if (!finalShape) {
+                    finalShape = shape;
+                } else {
+                    finalShape = Kernel.performBooleanOCCT(finalShape, shape, op.mode);
+                }
             }
-            
-            baseMesh = Kernel.performBoolean(
-                baseMesh.geometry, baseMesh.matrixWorld,
-                geom, getMatrix(op),
-                op.mode
-            );
-        }
-        if (baseMesh) {
-            baseMesh.material = getResultMaterial();
-            baseMesh.castShadow = true;
-            baseMesh.receiveShadow = true;
-            setResultMesh(baseMesh);
-            updateFaceCount((baseMesh.geometry.getAttribute('position').count / 3) | 0);
+
+            if (finalShape) {
+                const geom = Kernel.shapeToMesh(finalShape, 0.5);
+                const baseMesh = new THREE.Mesh(geom, getResultMaterial());
+                baseMesh.castShadow = true;
+                baseMesh.receiveShadow = true;
+                setResultMesh(baseMesh);
+                updateFaceCount((geom.getAttribute('position').count / 3) | 0);
+            }
+        } else {
+            // --- Legacy CSG Path ---
+            let baseMesh = null;
+            for (const op of state.operations) {
+                const geom = createGeometry(op);
+                geom.computeVertexNormals();
+                
+                if (!baseMesh) {
+                    baseMesh = new THREE.Mesh(geom);
+                    baseMesh.applyMatrix4(getMatrix(op));
+                    baseMesh.updateMatrixWorld(true);
+                    continue;
+                }
+                
+                baseMesh = Kernel.performBoolean(
+                    baseMesh.geometry, baseMesh.matrixWorld,
+                    geom, getMatrix(op),
+                    op.mode
+                );
+            }
+            if (baseMesh) {
+                baseMesh.material = getResultMaterial();
+                baseMesh.castShadow = true;
+                baseMesh.receiveShadow = true;
+                setResultMesh(baseMesh);
+                updateFaceCount((baseMesh.geometry.getAttribute('position').count / 3) | 0);
+            }
         }
         setStatus('Model updated');
     } catch (e) {
-        console.error('CSG error:', e);
-        setStatus('CSG error -- check geometry');
+        console.error('Kernel error:', e);
+        setStatus('Engine error -- check geometry');
     }
 }
 
