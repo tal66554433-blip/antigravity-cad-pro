@@ -1,262 +1,288 @@
-/* ═══════════════════════════════════════════════
-   Antigravity CAD Pro v2.3.1 — "Elite" Engineering Theme
-═══════════════════════════════════════════════ */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+/* 
+    Antigravity CAD v3 - Luxury Tech Style 
+    Theme: Deep Space (Parametric Edition)
+*/
 
 :root {
-    --bg-dark:    #0f1115;
-    --bg-panel:   #181a1f;
-    --bg-header:  #1c1e24;
-    --bg-accent:  #2d3139;
-    --blue:       #3b82f6;
-    --blue-glow:  rgba(59, 130, 246, 0.4);
-    --text-high:  #f4f4f5;
-    --text-mid:   #a1a1aa;
-    --text-low:   #52525b;
-    --border:     #272a31;
-    --border-light: #32363f;
-    --radius:     6px;
+    /* Color Palette */
+    --bg-main: #0a0b0d;
+    --bg-side: rgba(18, 20, 24, 0.85);
+    --bg-card: rgba(30, 34, 42, 0.6);
+    --accent: #3b82f6;
+    --accent-glow: rgba(59, 130, 246, 0.4);
+    --success: #10b981;
+    --danger: #ef4444;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-dim: #64748b;
+    --border: rgba(255, 255, 255, 0.08);
+    --glass: blur(12px);
+    
+    /* Spacing & Sizing */
+    --panel-w: 300px;
+    --header-h: 60px;
+    --radius: 12px;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
-body { 
-    background: var(--bg-dark); 
-    color: var(--text-high); 
-    font-family: 'Inter', -apple-system, sans-serif; 
-    overflow: hidden; 
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
 }
 
-/* --- App Layout --- */
-#app { display: flex; flex-direction: column; height: 100vh; }
+body {
+    background: var(--bg-main);
+    color: var(--text-primary);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
 
-/* --- Toolbar (Ribbon) --- */
-#toolbar {
-    height: 95px;
-    background: var(--bg-header);
+/* --- Layout Structure --- */
+
+#app-container {
+    display: flex;
+    flex: 1;
+    position: relative;
+    height: calc(100vh - var(--header-h));
+}
+
+#viewport-container {
+    flex: 1;
+    position: relative;
+    background: radial-gradient(circle at center, #1a1d23 0%, #0a0b0d 100%);
+}
+
+#canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* --- Premium Header --- */
+
+header {
+    height: var(--header-h);
+    background: var(--bg-main);
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
     padding: 0 20px;
-    gap: 30px;
+    justify-content: space-between;
     z-index: 100;
 }
-.tb-group {
+
+.logo {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 8px;
-    height: 75px;
+    gap: 12px;
+}
+
+.logo-icon {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, var(--accent), #60a5fa);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
     justify-content: center;
-}
-.tb-label {
-    font-size: 0.6rem;
-    color: var(--text-low);
-    text-transform: uppercase;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-}
-.tb-btns { display: flex; gap: 6px; }
-.tb-btn {
-    background: transparent;
-    border: 1px solid transparent;
-    color: var(--text-mid);
-    padding: 6px 12px;
-    border-radius: var(--radius);
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    min-width: 64px;
-}
-.tb-btn svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 1.5; }
-.tb-btn span { font-size: 0.68rem; font-weight: 500; letter-spacing: -0.01em; }
-
-.tb-btn:hover {
-    background: var(--bg-accent);
-    color: var(--text-high);
-    border-color: var(--border-light);
-}
-.tb-btn.active {
-    background: var(--blue);
-    color: white;
-    box-shadow: 0 0 15px var(--blue-glow);
+    box-shadow: 0 0 20px var(--accent-glow);
 }
 
-/* --- Workspace --- */
-#workspace { flex: 1; display: flex; overflow: hidden; }
+.logo-text {
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    background: linear-gradient(to right, #fff, #94a3b8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
 
-/* Sidebar */
+/* --- Sidebar (Feature Tree) --- */
+
 #sidebar {
-    width: 300px;
-    background: var(--bg-panel);
+    width: var(--panel-w);
+    background: var(--bg-side);
+    backdrop-filter: var(--glass);
     border-right: 1px solid var(--border);
     display: flex;
     flex-direction: column;
     z-index: 50;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.panel {
-    display: flex;
-    flex-direction: column;
+
+.panel-header {
+    padding: 16px 20px;
     border-bottom: 1px solid var(--border);
-}
-.panel.flex { flex: 1; }
-
-.panel-hdr {
-    background: #1e2128;
-    padding: 10px 16px;
-    font-size: 0.65rem;
-    font-weight: 800;
-    color: var(--text-low);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    border-bottom: 1px solid var(--border);
-}
-.panel-hdr svg { width: 14px; height: 14px; opacity: 0.5; }
-
-.panel-body {
-    flex: 1;
-    overflow-y: auto;
-    padding: 16px;
-}
-
-/* Tree Items */
-.tree-item {
-    display: flex;
-    align-items: center;
-    padding: 8px 12px;
-    border-radius: var(--radius);
-    cursor: pointer;
-    gap: 12px;
-    margin-bottom: 2px;
-    transition: 0.15s;
-}
-.tree-item:hover { background: var(--bg-accent); }
-.tree-item.selected { background: var(--blue); color: white; }
-
-/* Properties */
-.prop-row {
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-.prop-label {
-    font-size: 0.72rem;
-    color: var(--text-mid);
-    flex: 1;
-}
-.prop-input {
-    background: var(--bg-dark);
-    border: 1px solid var(--border);
-    color: white;
-    padding: 4px 10px;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    width: 85px;
-    text-align: right;
-    font-family: 'JetBrains Mono', monospace;
-}
-.prop-input:focus { border-color: var(--blue); outline: none; box-shadow: 0 0 5px var(--blue-glow); }
-
-/* Viewport */
-#viewport {
-    flex: 1;
-    position: relative;
-    background: radial-gradient(circle at center, #1e2025 0%, #0f1115 100%);
-}
-
-/* Status Bar */
-#statusbar {
-    height: 30px;
-    background: var(--blue);
-    color: white;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 20px;
-    font-size: 0.7rem;
+}
+
+.panel-title {
+    font-size: 0.85rem;
     font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
 }
-.version { font-family: monospace; opacity: 0.8; font-size: 0.65rem; }
 
-/* Empty States */
-.empty-state {
-    text-align: center;
-    padding: 40px 20px;
-    color: var(--text-low);
-    font-size: 0.75rem;
+#feature-tree {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
 }
-.empty-state svg { width: 40px; height: 40px; margin-bottom: 15px; opacity: 0.2; }
 
-/* ═══════════════ OVERLAYS & CONTROLS ═══════════════ */
+.tree-item {
+    padding: 10px 12px;
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 4px;
+    border: 1px solid transparent;
+}
 
-/* Sketch Toolbar */
-#sketch-toolbar {
-    position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
-    background: var(--bg-panel); border: 1px solid var(--border);
-    padding: 6px; border-radius: 8px; display: flex; gap: 4px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 100;
+.tree-item:hover {
+    background: rgba(255, 255, 255, 0.05);
 }
-.sk-btn {
-    background: transparent; border: none; color: var(--text-mid);
-    padding: 6px 12px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 6px;
-}
-.sk-btn svg { width: 16px; height: 16px; }
-.sk-btn:hover { background: var(--bg-accent); color: var(--text-high); }
-.sk-btn.active { background: var(--blue); color: white; }
-.sk-sep { width: 1px; height: 20px; background: var(--border); margin: 0 5px; align-self: center; }
-.sk-close { color: var(--danger); }
-.sk-close:hover { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
 
-/* View Controls */
-#view-controls {
-    position: absolute; top: 20px; right: 20px;
-    display: flex; flex-direction: column; gap: 4px; z-index: 10;
+.tree-item.selected {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: rgba(59, 130, 246, 0.3);
 }
-.view-btn {
-    width: 36px; height: 36px; background: var(--bg-panel); border: 1px solid var(--border);
-    color: var(--text-high); font-weight: 700; border-radius: 6px; cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-}
-.view-btn:hover { background: var(--blue); border-color: var(--blue); }
 
-/* Sketch Dimension Panel */
-#sketch-dim-panel {
-    position: absolute; right: 20px; top: 70px;
-    background: var(--bg-panel); border: 1px solid var(--border);
-    padding: 15px; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-    width: 200px; z-index: 100;
+.ti-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
 }
-.sk-dim-title { font-size: 0.7rem; color: var(--text-mid); font-weight: 700; margin-bottom: 10px; text-transform: uppercase; }
-.sk-dim-btn {
-    width: 100%; padding: 8px; margin-top: 10px;
-    background: var(--blue); color: white; border: none; border-radius: 4px;
-    font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;
-}
-.sk-dim-btn:hover { background: var(--accent-hover); }
 
-/* Command HUD */
-#command-hud {
-    position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
-    background: var(--bg-header); border: 1px solid var(--blue);
-    border-radius: 8px; width: 400px; box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-    display: none; flex-direction: column; overflow: hidden; z-index: 1000;
+.ti-name {
+    font-size: 0.9rem;
+    font-weight: 500;
 }
-#command-hud.active { display: flex; }
-#cmd-input {
-    width: 100%; padding: 15px; background: transparent; border: none;
-    color: white; font-size: 1.1rem; border-bottom: 1px solid var(--border);
+
+/* --- Floating Toolbar --- */
+
+#toolbar {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-card);
+    backdrop-filter: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 8px;
+    display: flex;
+    gap: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
-#cmd-input:focus { outline: none; }
-#cmd-list { max-height: 250px; overflow-y: auto; }
-.cmd-item {
-    padding: 10px 15px; cursor: pointer; display: flex; justify-content: space-between;
-    font-size: 0.85rem; color: var(--text-mid);
+
+.tool-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
 }
-.cmd-item:hover, .cmd-item.selected { background: var(--blue); color: white; }
-.cmd-shortcut { font-family: monospace; opacity: 0.7; font-size: 0.75rem; }
+
+.tool-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+.tool-btn.active {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 4px 15px var(--accent-glow);
+}
+
+/* --- HUD & Overlays --- */
+
+#loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg-main);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.loader {
+    width: 48px;
+    height: 48px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* --- Context Menu --- */
+
+#context-menu {
+    position: fixed;
+    background: var(--bg-card);
+    backdrop-filter: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 6px;
+    min-width: 160px;
+    display: none;
+    flex-direction: column;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    z-index: 1000;
+}
+
+.cm-item {
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cm-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* --- Status Bar --- */
+
+#status-bar {
+    position: absolute;
+    bottom: 0;
+    left: var(--panel-w);
+    right: 0;
+    height: 24px;
+    background: rgba(0,0,0,0.3);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    justify-content: space-between;
+}
