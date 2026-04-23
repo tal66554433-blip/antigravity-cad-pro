@@ -1,0 +1,262 @@
+/* ═══════════════════════════════════════════════
+   Antigravity CAD Pro v2.3.1 — "Elite" Engineering Theme
+═══════════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --bg-dark:    #0f1115;
+    --bg-panel:   #181a1f;
+    --bg-header:  #1c1e24;
+    --bg-accent:  #2d3139;
+    --blue:       #3b82f6;
+    --blue-glow:  rgba(59, 130, 246, 0.4);
+    --text-high:  #f4f4f5;
+    --text-mid:   #a1a1aa;
+    --text-low:   #52525b;
+    --border:     #272a31;
+    --border-light: #32363f;
+    --radius:     6px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+body { 
+    background: var(--bg-dark); 
+    color: var(--text-high); 
+    font-family: 'Inter', -apple-system, sans-serif; 
+    overflow: hidden; 
+}
+
+/* --- App Layout --- */
+#app { display: flex; flex-direction: column; height: 100vh; }
+
+/* --- Toolbar (Ribbon) --- */
+#toolbar {
+    height: 95px;
+    background: var(--bg-header);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 30px;
+    z-index: 100;
+}
+.tb-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    height: 75px;
+    justify-content: center;
+}
+.tb-label {
+    font-size: 0.6rem;
+    color: var(--text-low);
+    text-transform: uppercase;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+}
+.tb-btns { display: flex; gap: 6px; }
+.tb-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-mid);
+    padding: 6px 12px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 64px;
+}
+.tb-btn svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 1.5; }
+.tb-btn span { font-size: 0.68rem; font-weight: 500; letter-spacing: -0.01em; }
+
+.tb-btn:hover {
+    background: var(--bg-accent);
+    color: var(--text-high);
+    border-color: var(--border-light);
+}
+.tb-btn.active {
+    background: var(--blue);
+    color: white;
+    box-shadow: 0 0 15px var(--blue-glow);
+}
+
+/* --- Workspace --- */
+#workspace { flex: 1; display: flex; overflow: hidden; }
+
+/* Sidebar */
+#sidebar {
+    width: 300px;
+    background: var(--bg-panel);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    z-index: 50;
+}
+.panel {
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid var(--border);
+}
+.panel.flex { flex: 1; }
+
+.panel-hdr {
+    background: #1e2128;
+    padding: 10px 16px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: var(--text-low);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+}
+.panel-hdr svg { width: 14px; height: 14px; opacity: 0.5; }
+
+.panel-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+}
+
+/* Tree Items */
+.tree-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    gap: 12px;
+    margin-bottom: 2px;
+    transition: 0.15s;
+}
+.tree-item:hover { background: var(--bg-accent); }
+.tree-item.selected { background: var(--blue); color: white; }
+
+/* Properties */
+.prop-row {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.prop-label {
+    font-size: 0.72rem;
+    color: var(--text-mid);
+    flex: 1;
+}
+.prop-input {
+    background: var(--bg-dark);
+    border: 1px solid var(--border);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    width: 85px;
+    text-align: right;
+    font-family: 'JetBrains Mono', monospace;
+}
+.prop-input:focus { border-color: var(--blue); outline: none; box-shadow: 0 0 5px var(--blue-glow); }
+
+/* Viewport */
+#viewport {
+    flex: 1;
+    position: relative;
+    background: radial-gradient(circle at center, #1e2025 0%, #0f1115 100%);
+}
+
+/* Status Bar */
+#statusbar {
+    height: 30px;
+    background: var(--blue);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+.version { font-family: monospace; opacity: 0.8; font-size: 0.65rem; }
+
+/* Empty States */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-low);
+    font-size: 0.75rem;
+}
+.empty-state svg { width: 40px; height: 40px; margin-bottom: 15px; opacity: 0.2; }
+
+/* ═══════════════ OVERLAYS & CONTROLS ═══════════════ */
+
+/* Sketch Toolbar */
+#sketch-toolbar {
+    position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+    background: var(--bg-panel); border: 1px solid var(--border);
+    padding: 6px; border-radius: 8px; display: flex; gap: 4px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 100;
+}
+.sk-btn {
+    background: transparent; border: none; color: var(--text-mid);
+    padding: 6px 12px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 6px;
+}
+.sk-btn svg { width: 16px; height: 16px; }
+.sk-btn:hover { background: var(--bg-accent); color: var(--text-high); }
+.sk-btn.active { background: var(--blue); color: white; }
+.sk-sep { width: 1px; height: 20px; background: var(--border); margin: 0 5px; align-self: center; }
+.sk-close { color: var(--danger); }
+.sk-close:hover { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+
+/* View Controls */
+#view-controls {
+    position: absolute; top: 20px; right: 20px;
+    display: flex; flex-direction: column; gap: 4px; z-index: 10;
+}
+.view-btn {
+    width: 36px; height: 36px; background: var(--bg-panel); border: 1px solid var(--border);
+    color: var(--text-high); font-weight: 700; border-radius: 6px; cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+.view-btn:hover { background: var(--blue); border-color: var(--blue); }
+
+/* Sketch Dimension Panel */
+#sketch-dim-panel {
+    position: absolute; right: 20px; top: 70px;
+    background: var(--bg-panel); border: 1px solid var(--border);
+    padding: 15px; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    width: 200px; z-index: 100;
+}
+.sk-dim-title { font-size: 0.7rem; color: var(--text-mid); font-weight: 700; margin-bottom: 10px; text-transform: uppercase; }
+.sk-dim-btn {
+    width: 100%; padding: 8px; margin-top: 10px;
+    background: var(--blue); color: white; border: none; border-radius: 4px;
+    font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;
+}
+.sk-dim-btn:hover { background: var(--accent-hover); }
+
+/* Command HUD */
+#command-hud {
+    position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+    background: var(--bg-header); border: 1px solid var(--blue);
+    border-radius: 8px; width: 400px; box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    display: none; flex-direction: column; overflow: hidden; z-index: 1000;
+}
+#command-hud.active { display: flex; }
+#cmd-input {
+    width: 100%; padding: 15px; background: transparent; border: none;
+    color: white; font-size: 1.1rem; border-bottom: 1px solid var(--border);
+}
+#cmd-input:focus { outline: none; }
+#cmd-list { max-height: 250px; overflow-y: auto; }
+.cmd-item {
+    padding: 10px 15px; cursor: pointer; display: flex; justify-content: space-between;
+    font-size: 0.85rem; color: var(--text-mid);
+}
+.cmd-item:hover, .cmd-item.selected { background: var(--blue); color: white; }
+.cmd-shortcut { font-family: monospace; opacity: 0.7; font-size: 0.75rem; }

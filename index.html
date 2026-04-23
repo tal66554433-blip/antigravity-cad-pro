@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antigravity CAD Pro</title>
+    <meta name="description" content="Professional 3D CAD with Sketch-to-Extrude, Boolean Operations, and STL Export">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <meta name="theme-color" content="#0a0a0f">
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "./lib/three.module.js",
+            "three/addons/controls/OrbitControls.js": "./lib/OrbitControls.js",
+            "three/addons/controls/TransformControls.js": "./lib/TransformControls.js"
+        }
+    }
+    </script>
+
+    <script>
+        window.onerror = function(msg, url, line) {
+            const overlay = document.getElementById('loading-overlay');
+            if (overlay) {
+                overlay.innerHTML = `<div style="padding: 20px; color: #ff5555; text-align: left; font-family: monospace;">
+                    <h2 style="margin-bottom: 10px;">Critical Boot Error</h2>
+                    <p>${msg}</p>
+                    <p style="font-size: 0.8rem; opacity: 0.7;">at ${url}:${line}</p>
+                    <button onclick="location.reload(true)" style="margin-top: 20px; padding: 8px 16px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer;">Hard Reload</button>
+                </div>`;
+            }
+        };
+    </script>
+</head>
+<body>
+<div id="app">
+    <div id="loading-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0c10; z-index: 9999; display: flex; align-items: center; justify-content: center; color: white; font-family: sans-serif;">
+        <div style="text-align: center;">
+            <div style="width: 40px; height: 40px; border: 4px solid #3b82f6; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+            <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+            <div style="font-size: 1.2rem; font-weight: bold; margin-bottom: 5px;">Antigravity CAD Pro</div>
+            <div style="font-size: 0.9rem; opacity: 0.6;">Loading Geometric Kernel...</div>
+        </div>
+    </div>
+
+    <!-- ═══════════════ TOOLBAR ═══════════════ -->
+    <header id="toolbar">
+        <div class="tb-brand">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+            <span>Antigravity CAD</span>
+            <span class="badge-pro">PRO</span>
+        </div>
+        <div class="tb-sep"></div>
+
+        <!-- Sketch -->
+        <div class="tb-group">
+            <div class="tb-group-label">Sketch</div>
+            <div class="tb-btns">
+                <button class="tb-btn sketch-btn" id="btn-new-sketch" data-tip="New Sketch on XZ plane (K)">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                    <span>New Sketch</span>
+                </button>
+                <button class="tb-btn sketch-btn" id="btn-extrude" style="display:none" data-tip="Extrude Sketch (E)">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="17 11 12 6 7 11"/><line x1="12" y1="18" x2="12" y2="6"/><rect x="4" y="18" width="16" height="3" rx="1"/></svg>
+                    <span>Extrude</span>
+                </button>
+                <button class="tb-btn sketch-btn" id="btn-revolve" style="display:none" data-tip="Revolve Sketch">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /><path d="M12 3v18" /></svg>
+                    <span>Revolve</span>
+                </button>
+                <button class="tb-btn sketch-btn" id="btn-exit-sketch" style="display:none" data-tip="Exit Sketch (Esc)">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    <span>Exit Sketch</span>
+                </button>
+            </div>
+        </div>
+        <div class="tb-sep"></div>
+
+        <!-- Create Primitives -->
+        <div class="tb-group">
+            <div class="tb-group-label">Primitives</div>
+            <div class="tb-btns">
+                <button class="tb-btn" id="btn-box" data-shape="box" data-tip="Box (B)">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                    <span>Box</span>
+                </button>
+                <button class="tb-btn" id="btn-cylinder" data-shape="cylinder" data-tip="Cylinder (C)">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 5v14c0 1.66-4.03 3-9 3s-9-1.34-9-3V5"/></svg>
+                    <span>Cylinder</span>
+                </button>
+                <button class="tb-btn" id="btn-sphere" data-shape="sphere" data-tip="Sphere (S)">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><ellipse cx="12" cy="12" rx="10" ry="4"/><line x1="12" y1="2" x2="12" y2="22"/></svg>
+                    <span>Sphere</span>
+                </button>
+                <button class="tb-btn" id="btn-cone" data-shape="cone" data-tip="Cone">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2L3 20h18L12 2z"/><ellipse cx="12" cy="20" rx="9" ry="2"/></svg>
+                    <span>Cone</span>
+                </button>
+                <button class="tb-btn" id="btn-torus" data-shape="torus" data-tip="Torus">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>
+                    <span>Torus</span>
+                </button>
+            </div>
+        </div>
+        <div class="tb-sep"></div>
+
+        <!-- Boolean -->
+        <div class="tb-group">
+            <div class="tb-group-label">Boolean</div>
+            <div class="tb-btns">
+                <button class="tb-btn mode-btn active" id="btn-mode-add" data-mode="add" data-tip="Union">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    <span>Union</span>
+                </button>
+                <button class="tb-btn mode-btn" id="btn-mode-cut" data-mode="cut" data-tip="Cut">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    <span>Cut</span>
+                </button>
+                <button class="tb-btn mode-btn" id="btn-mode-intersect" data-mode="intersect" data-tip="Intersect">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="12" r="5"/><circle cx="15" cy="12" r="5"/></svg>
+                    <span>Intersect</span>
+                </button>
+            </div>
+        </div>
+        <div class="tb-sep"></div>
+
+        <!-- Transform -->
+        <div class="tb-group">
+            <div class="tb-group-label">Transform</div>
+            <div class="tb-btns">
+                <button class="tb-btn transform-btn active" id="btn-translate" data-transform="translate" data-tip="Move (G)">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><polyline points="15 19 12 22 9 19"/><polyline points="19 9 22 12 19 15"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg>
+                    <span>Move</span>
+                </button>
+                <button class="tb-btn transform-btn" id="btn-rotate" data-transform="rotate" data-tip="Rotate (R)">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21.5 2v6h-6"/><path d="M21.34 15.57a10 10 0 1 1-.57-8.38"/></svg>
+                    <span>Rotate</span>
+                </button>
+                <button class="tb-btn transform-btn" id="btn-scale" data-transform="scale" data-tip="Scale">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+                    <span>Scale</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="tb-spacer"></div>
+
+        <!-- Right tools -->
+        <div class="tb-btns">
+            <button class="tb-btn" id="btn-measure" data-tip="Measure (M)">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12h5"/><path d="M17 12h5"/><path d="M7 4v16"/><path d="M17 4v16"/></svg>
+                <span>Measure</span>
+            </button>
+            <button class="tb-btn" id="btn-undo" data-tip="Undo (Ctrl+Z)">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+            </button>
+            <button class="tb-btn" id="btn-redo" data-tip="Redo (Ctrl+Y)">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            </button>
+        </div>
+        <div class="tb-sep"></div>
+        <button class="tb-btn tb-export" id="btn-export" data-tip="Export as STL">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>Export STL</span>
+        </button>
+    </header>
+
+    <!-- ═══════════════ WORKSPACE ═══════════════ -->
+    <div id="workspace">
+
+        <!-- Sidebar -->
+        <aside id="sidebar">
+            <div class="panel" id="tree-panel">
+                <div class="panel-hdr">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                    Feature Tree
+                </div>
+                <div class="panel-body" id="feature-tree">
+                    <div class="empty-state" id="empty-tree">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.25"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                        <p>No features</p>
+                        <span>Use Sketch or Primitives</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel" id="props-panel">
+                <div class="panel-hdr">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    Properties
+                </div>
+                <div class="panel-body" id="properties-content">
+                    <div class="empty-state"><p>Select a feature</p></div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Viewport -->
+        <div id="viewport">
+            <canvas id="canvas"></canvas>
+
+            <!-- Sketch Canvas Overlay -->
+            <canvas id="sketch-canvas" style="display:none;"></canvas>
+
+            <!-- Sketch Toolbar (shown during sketching) -->
+            <div id="sketch-toolbar" style="display:none;">
+                <button class="sk-btn active" id="sk-line" data-tip="Line (L)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="19" x2="19" y2="5"/></svg> Line
+                </button>
+                <button class="sk-btn" id="sk-rect" data-tip="Rectangle">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg> Rectangle
+                </button>
+                <button class="sk-btn" id="sk-circle" data-tip="Circle">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg> Circle
+                </button>
+                <button class="sk-btn" id="sk-polygon" data-tip="Polygon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/></svg> Polygon
+                </button>
+                <button class="sk-btn" id="sk-arc" data-tip="Arc">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 18 0"/></svg> Arc
+                </button>
+                <div class="sk-sep"></div>
+                <button class="sk-btn" id="sk-undo-line" data-tip="Remove last segment">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg> Undo
+                </button>
+                <button class="sk-btn sk-close" id="sk-close-shape" data-tip="Close shape">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Close
+                </button>
+            </div>
+
+            <!-- Sketch Dimension Panel -->
+            <div id="sketch-dim-panel" style="display:none;">
+                <div class="sk-dim-title">Sketch Dimensions (mm)</div>
+                <div id="sketch-dim-list"></div>
+                <button class="sk-dim-btn" id="btn-do-extrude">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 11 12 6 7 11"/><line x1="12" y1="18" x2="12" y2="6"/></svg>
+                    Extrude →
+                </button>
+            </div>
+
+            <!-- Viewport Controls -->
+            <div id="view-controls">
+                <button class="view-btn" data-view="perspective">3D</button>
+                <button class="view-btn" data-view="front">F</button>
+                <button class="view-btn" data-view="top">T</button>
+                <button class="view-btn" data-view="right">R</button>
+            </div>
+
+            <!-- Coordinate Display -->
+            <div id="viewport-info">
+                <span id="coord-display">X: 0.00  Y: 0.00  Z: 0.00 mm</span>
+            </div>
+
+            <!-- Measure Result -->
+            <div id="measure-display" style="display:none;">
+                <span id="measure-text">Distance: 0.00 mm</span>
+                <button id="measure-clear" class="sk-btn">✕</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Bar -->
+    <footer id="statusbar">
+        <div class="sb-left">
+            <span class="sb-dot"></span>
+            <span id="status-msg">Ready — New Sketch or select a Primitive to start modeling</span>
+        </div>
+        <div class="sb-right">
+            <span>mm</span>
+            <span class="sb-sep">|</span>
+            <span id="face-count">Faces: 0</span>
+            <span class="sb-sep">|</span>
+            <span id="app-version-tag" class="version">v2.3.1 - SolidWorks Elite</span>
+        </div>
+    </footer>
+
+    <!-- Context Menu -->
+    <div id="context-menu" class="context-menu">
+        <!-- Empty Space Menu -->
+        <div id="cm-global-options" class="cm-section">
+            <button class="cm-btn" id="cm-global-new-sketch">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> New Sketch
+            </button>
+            <div class="cm-sep"></div>
+            <div class="cm-label">Add Primitive</div>
+            <button class="cm-btn" data-cm-shape="box">Box</button>
+            <button class="cm-btn" data-cm-shape="cylinder">Cylinder</button>
+            <button class="cm-btn" data-cm-shape="sphere">Sphere</button>
+            <div class="cm-sep"></div>
+            <button class="cm-btn" id="cm-global-export">Export STL</button>
+        </div>
+        
+        <!-- Object Menu -->
+        <div id="cm-object-options" class="cm-section" style="display: none;">
+            <div class="cm-title" id="cm-object-title">Feature</div>
+            <button class="cm-btn" id="cm-obj-edit">Edit Properties</button>
+            <button class="cm-btn" id="cm-obj-color">Change Appearance</button>
+            <div class="cm-sep"></div>
+            <button class="cm-btn text-danger" id="cm-obj-delete">Delete</button>
+        </div>
+
+        <!-- Sketch Mode Menu -->
+        <div id="cm-sketch-options" class="cm-section" style="display: none;">
+            <button class="cm-btn" id="cm-sk-close">Close Shape</button>
+            <button class="cm-btn" id="cm-sk-extrude">Extrude</button>
+            <button class="cm-btn" id="cm-sk-revolve">Revolve</button>
+            <div class="cm-sep"></div>
+            <button class="cm-btn text-danger" id="cm-sk-cancel">Cancel Sketch</button>
+        </div>
+    </div>
+    <!-- Command HUD -->
+    <div id="command-hud" class="cmd-hud">
+        <input type="text" id="cmd-input" placeholder="Search commands... (e.g. Extrude, Box)" autocomplete="off">
+        <div id="cmd-list"></div>
+    </div>
+</div>
+
+<script type="module" src="src/main.js?v=2.1.1"></script>
+<!-- Service Worker disabled for development to ensure live updates 
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('SW registered'))
+                .catch(err => console.log('SW failed', err));
+        });
+    }
+</script>
+-->
+</body>
+</html>
